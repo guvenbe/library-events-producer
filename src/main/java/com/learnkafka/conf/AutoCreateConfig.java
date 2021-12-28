@@ -1,4 +1,4 @@
-package com.learnkafka.controller;
+package com.learnkafka.conf;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
