@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LibraryEventsController.class)
@@ -47,8 +48,8 @@ public class LibraryEventControllerUnitTest {
         doNothing().when(libraryEventProducer).sendLibraryEventAsync(isA(LibraryEvent.class));
         //when
         mockMvc.perform(post("/v1/libraryevent")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
 
@@ -60,22 +61,24 @@ public class LibraryEventControllerUnitTest {
     void postLibraryEvent_4xx() throws Exception {
         //given
         Book book = Book.builder()
-                .bookId(123)
-                .bookAuthor("Dilip")
+                .bookId(null)
+                .bookAuthor(null)
                 .bookAuthor("Kafkasuing Spring Boot")
                 .build();
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(null)
-                .book(null)
+                .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
         doNothing().when(libraryEventProducer).sendLibraryEventAsync(isA(LibraryEvent.class));
         //when
+        String expectedErrorMessage = "book.bookId - must not be null, book.bookName - must not be blank";
         mockMvc.perform(post("/v1/libraryevent")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().string(expectedErrorMessage));
 
 
         //then
