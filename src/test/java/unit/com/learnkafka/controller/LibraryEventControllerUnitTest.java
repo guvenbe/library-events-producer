@@ -55,4 +55,30 @@ public class LibraryEventControllerUnitTest {
         //then
 
     }
+
+    @Test
+    void postLibraryEvent_4xx() throws Exception {
+        //given
+        Book book = Book.builder()
+                .bookId(123)
+                .bookAuthor("Dilip")
+                .bookAuthor("Kafkasuing Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(null)
+                .book(null)
+                .build();
+        String json = objectMapper.writeValueAsString(libraryEvent);
+        doNothing().when(libraryEventProducer).sendLibraryEventAsync(isA(LibraryEvent.class));
+        //when
+        mockMvc.perform(post("/v1/libraryevent")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+
+
+        //then
+
+    }
 }
