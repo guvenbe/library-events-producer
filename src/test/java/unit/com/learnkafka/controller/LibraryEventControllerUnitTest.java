@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +38,7 @@ public class LibraryEventControllerUnitTest {
         Book book = Book.builder()
                 .bookId(123)
                 .bookAuthor("Dilip")
-                .bookAuthor("Kafkasuing Spring Boot")
+                .bookName("Kafka Using Spring Boot")
                 .build();
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
@@ -45,7 +46,7 @@ public class LibraryEventControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        doNothing().when(libraryEventProducer).sendLibraryEventAsync(isA(LibraryEvent.class));
+        when(libraryEventProducer.sendLibraryEventAsync(isA(LibraryEvent.class))).thenReturn(null);
         //when
         mockMvc.perform(post("/v1/libraryevent")
                         .content(json)
@@ -63,7 +64,7 @@ public class LibraryEventControllerUnitTest {
         Book book = Book.builder()
                 .bookId(null)
                 .bookAuthor(null)
-                .bookAuthor("Kafkasuing Spring Boot")
+                .bookName("Kafka using Spring Boot")
                 .build();
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
@@ -71,9 +72,9 @@ public class LibraryEventControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        doNothing().when(libraryEventProducer).sendLibraryEventAsync(isA(LibraryEvent.class));
+        when(libraryEventProducer.sendLibraryEventAsync(isA(LibraryEvent.class))).thenReturn(null);
         //when
-        String expectedErrorMessage = "book.bookId - must not be null, book.bookName - must not be blank";
+        String expectedErrorMessage = "book.bookAuthor - must not be blank, book.bookId - must not be null";
         mockMvc.perform(post("/v1/libraryevent")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
